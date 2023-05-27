@@ -3,7 +3,6 @@
 package activate;
 
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import dao.DeleteDAO;
 import employee.Employee;
@@ -12,16 +11,17 @@ import function.Logout;
 
 //入力を受け付け、社員情報を回復するクラス
 public class ActivateControl {
-	private Scanner scanner; // ユーザーの入力を受け付けるためのスキャナー
+	//private Scanner scanner; // ユーザーの入力を受け付けるためのスキャナー
+	// scannerはKeyboardクラスの入力メソッドを使うため必要なくなりました。2023-05-28-01:45 Hotehama
 	private DeleteDAO deleteDAO; // 検索を行うためのDAOクラスのインスタンス
-	private String input; //コンソールからの入力を代入する
+	// String inputはKeyboardクラスの入力メソッドを使うため必要なくなりました。2023-05-28-01:46 Hotehama
 	private int activateEmpNumber = 0; //削除するための社員番号を代入する
 
 	/*
-	 * 概要：ControlDeleteクラスのコンストラクタ。スキャナーと検索DAOを初期化する。
+	 * 概要：ControlDeleteクラスのコンストラクタ。検索DAOを初期化する。
 	 */
 	public ActivateControl() {
-		scanner = new Scanner(System.in);
+		//scanner = new Scanner(System.in);
 		deleteDAO = new DeleteDAO();
 	}
 
@@ -32,66 +32,59 @@ public class ActivateControl {
 	 * 戻り値：なし
 	 */
 	public void activate() throws Logout{
+		/**/
 		// 全機能についてActivateAndDeleteTestMainで期待される実行を確認。2023-05-26-18:25 Shimanaka
-		boolean exit = false;
 		System.out.println("【社員情報の回復を行います。】");
-		while (!exit) {
-			System.out.print("回復したい社員の社員番号を入力してください> ");
-			//input = scanner.nextLine();
-			input = Keyboard.kbInput();
-			if (input.equalsIgnoreCase("home")) {
-				//本来、操作選択に戻る
-				System.out.println("終了しました");
-				exit = true;
-			} else if(input.length() == 0 || input == null){
-				System.out.println("少なくとも一文字を入力してください");
-			} else if(isNumeric(input)){
-				activateEmpNumber = Integer.parseInt(input);
-				ArrayList<Employee> result = deleteDAO.searchDeletedEmployees(activateEmpNumber);
-				printSearchResult(result);
+		System.out.print("回復したい社員の社員番号を入力してください> ");
+		//input = scanner.nextLine();
+		activateEmpNumber = Keyboard.kbInputInt();
+		
+			
+			// kbInputIntに置換したため、入力に対する一連の分岐処理を削除しました 2023-05-28-01:47 Hotehama
+			ArrayList<Employee> result = deleteDAO.searchDeletedEmployees(activateEmpNumber);
+			printSearchResult(result);
 
-				while(true) {
-					System.out.println("この社員を回復しますか？(はい: y, いいえ: n)> ");
-					String confirmActivate = scanner.nextLine();
-					if(confirmActivate.equals("y")){
-						//削除確認で入力が y(はい) のとき、DAOに論理削除を依頼
-						deleteDAO.activateEmployee(activateEmpNumber);
-						System.out.println("サンプル：引き続き他の社員の回復を行いますか？(はい: y, ホームに戻る: home)");
-						//todo: 入力がyなら回復機能の頭に戻る(break?)、homeなら昨日選択に戻る
-						break;
-					}else if(confirmActivate.equals("n")){
-						//回復確認で入力が　n(いいえ)　のとき、回復機能の頭に戻る
-						break;
-					}else {
-						System.out.println(" y 又は n を入力してください。");
-						printSearchResult(result);
-						continue;
+			while(true) {
+				System.out.println("この社員を回復しますか？(はい: y, いいえ: n, ホームに戻る: $home)");
+				System.out.print("> ");
+				String confirmActivate = Keyboard.kbInput();
+				if(confirmActivate.equals("y")){
+					//削除確認で入力が y(はい) のとき、DAOに論理削除を依頼
+					deleteDAO.activateEmployee(activateEmpNumber);
+					while (true) {
+						// 削除操作の後、次の動作を尋ねる
+						System.out.println("*******************************************************");
+						System.out.println("引き続き他の社員の回復を行いますか？(はい: y, ホームに戻る: $home)");
+						System.out.println("*******************************************************");
+						System.out.print("> ");
+						String selectNextAction = Keyboard.kbInput();
+						if (selectNextAction.equals("y")) {
+							activate();
+							break;
+						} else {
+							System.out.println(" y 又は $home を入力してください。");
+							continue;
+						}
+						// ActivateAndDeleteTestMainで失敗、todoなので未実装と認識。2023-05-26-18:22 Shimanaka
 					}
+					//todo: 入力がyなら回復機能の頭に戻る(break?)、homeなら昨日選択に戻る
+					break;
+				}else if(confirmActivate.equals("n")){
+					//回復確認で入力が　n(いいえ)　のとき、回復機能の頭に戻る
+					activate();
+					break;
+				}else {
+					System.out.println(" y 又は n を入力してください。");
+					printSearchResult(result);
+					continue;
 				}
-
-			}else {
-				System.out.println("入力は数字で行ってください");
 			}
-		}
+
+		
 	}
 
-	/*
-	 * メソッド名：isNumeric
-	 * 概要：引数の文字列が数字かどうか判定する
-	 * 引数：	String　str コンソールからの入力
-	 * 戻り値：boolean
-	 */
-	private static boolean isNumeric(String str) {
-	        if (str == null || str.length() == 0) {
-	            return false;
-	        }
-	        for (char c : str.toCharArray()) {
-	            if (!Character.isDigit(c)) {
-	                return false;
-	            }
-	        }
-	        return true;
-	    }
+	// isNumericメソッドはKeyboardクラスに移行したので、このクラスからは削除しました 2023-05-28-01:55 Hotehama
+
 
 	/*
 	 * メソッド名：printSearchResult

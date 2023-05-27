@@ -1,0 +1,10 @@
+2023_0527_2023 保手濱
+気付き3点
+・activeが0の社員でもログインできる
+・DeleteControlとActivateControlの中に全く同じメソッドprintSearchResultが存在するので、どっちかだけにしてもいいのでは
+・Keyboardクラスで入力処理を行っているため、$homeコマンドで割といつでも機能選択画面に戻れるので、入力を促すSystem.out.printの文字列に「ホームに戻る: $home」という選択肢の表示が毎回必要
+
+2023_0528_0211 保手濱
+・ActivateControl.javaとDeleteControl.javaを編集
+・一応所定の処理はできるようになっているかと思います
+・現時点で一旦git push

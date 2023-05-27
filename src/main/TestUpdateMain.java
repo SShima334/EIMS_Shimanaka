@@ -2,6 +2,9 @@ package update;
 
 import java.util.ArrayList;
 
+import dao.TestUpdateDAO;
+import employee.Employee;
+
 public class TestUpdateMain {
 	public static void main(String args[]) {
 		System.out.println("=== first test ===");

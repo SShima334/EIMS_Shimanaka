@@ -98,7 +98,6 @@ public class DeleteDAO {
 		int affectedRows = editEmployeeActivation(deleteEmpNo, sql);
 		if (affectedRows > 0) {
 			System.out.println("【社員番号： " + deleteEmpNo + "の社員情報を削除しました。】");
-			System.out.println("やったあ");
 		} else {
 			System.out.println("削除失敗！");
 		}
